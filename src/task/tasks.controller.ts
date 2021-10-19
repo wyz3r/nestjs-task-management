@@ -1,16 +1,29 @@
-import { Body, Controller, Get, Param, Post, Delete, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, Patch, Query, Req } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilterDto } from './dto/get-task-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
-import { Task, TaskStatus } from './task.model';
+import { Task } from './task.model';
 import { TasksService } from './tasks.service';
+import { ApiHeaderOptions, ApiHeaders, ApiTags,  } from '@nestjs/swagger';
 
+
+const r: ApiHeaderOptions[] = [
+    {name: 'name',
+    description: 'name of the user'
+}, {name: 'token',
+description: 'name of the user'
+}
+  ]
+
+
+@ApiTags('Tasks')
 @Controller('tasks')
 export class TasksController {
     constructor(private taskService: TasksService){}
-
+    @ApiHeaders(r)
     @Get()
-    getTasks(@Query() filterDto: GetTaskFilterDto): Task[]{
+    getTasks(@Query() filterDto: GetTaskFilterDto, @Req() req: any): Task[]{
+        console.log(req)
         if(Object.keys(filterDto).length){
             //.. 
             return this.taskService.getTasksWithFilter(filterDto)
@@ -20,7 +33,7 @@ export class TasksController {
     }
 
     @Get('/:id')
-    getAllTaskById(@Param('id') id:string ): Task{
+    getAllTaskById(@Param('id') id:string  ): Task{
         return this.taskService.getTaskById(id);
     }
 
